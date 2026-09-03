@@ -640,8 +640,6 @@ jobs:
             echo "Using Clang: $(clang --version | head -n 1)"
             echo "Using LLD: $(ld.lld --version | head -n 1)"
 
-            export KCFLAGS="-mllvm -regalloc-evict=default"
-            export HOSTCFLAGS="-mllvm -regalloc-evict=default"
 
             unset DTC
             export DTC="${{ github.workspace }}/android-kernel/prebuilts/build-tools/bin/dtc"
@@ -688,7 +686,6 @@ jobs:
                  ARCH=arm64 \
                  CROSS_COMPILE="aarch64-linux-gnu-" \
                  CC="ccache clang" \
-                 HOSTCC="ccache clang" \
                  O=$GITHUB_WORKSPACE/android-kernel/out \
                  LLVM_IAS=1 \
                  LD="ld.lld" \
@@ -706,8 +703,6 @@ jobs:
                  LLVM=1 \
                  ARCH=arm64 \
                  CROSS_COMPILE="aarch64-linux-gnu-" \
-                 CC="ccache clang" \
-                 HOSTCC="ccache clang" \
                  O=$GITHUB_WORKSPACE/android-kernel/out \
                  LLVM_IAS=1 \
                  olddefconfig
@@ -718,7 +713,6 @@ jobs:
                 ARCH=arm64 \
                 CROSS_COMPILE="aarch64-linux-gnu-" \
                 CC="ccache clang" \
-                HOSTCC="ccache clang" \
                 LD="ld.lld" \
                 HOSTLD="ld.lld" \
                 O=$GITHUB_WORKSPACE/android-kernel/out \
