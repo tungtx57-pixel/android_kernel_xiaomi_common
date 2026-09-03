@@ -349,43 +349,27 @@ jobs:
         uses: actions/cache@v4
         with:
           path: android-kernel/prebuilts-master/clang/host/linux-x86
-          key: clang-${{ github.event.inputs.KERNEL_BRANCH }}
+          key: clang-r416183b-v1
           restore-keys: |
-            clang-
+            clang-r416183b-
 
       - name: Clone Clang if cache missed
         if: steps.cache-clang.outputs.cache-hit != 'true'
         run: |
-          git clone -b main-kernel \
+          git clone -b master-kernel-build-2021 \
                     --single-branch \
                     --depth=1 \
                     https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 \
                     $GITHUB_WORKSPACE/android-kernel/prebuilts-master/clang/host/linux-x86
-          # git clone -b ${{ github.event.inputs.CLANG_BRANCH }} --depth=1 --single-branch ${{ github.event.inputs.CLANG_PREBUILT }} $GITHUB_WORKSPACE/android-kernel/prebuilts-master/clang/host/linux-x86/clang-r416183b
-          # git clone -b 21 \
-              # --single-branch \
-              # --depth=1 \
-              # --no-tags \
-              # https://gitlab.com/clangsantoni/zyc_clang.git \
-              # $GITHUB_WORKSPACE/android-kernel/prebuilts-master/clang/host/linux-x86/clang-r416183b
-          # mkdir -p $GITHUB_WORKSPACE/android-kernel/prebuilts-master/clang/host/linux-x86
-          # cd $GITHUB_WORKSPACE/android-kernel/prebuilts-master/clang/host/linux-x86
-          # ln -sf clang-r584948 clang-r416183b
-          # aria2c -s16 -x16 -k1M https://github.com/ZyCromerZ/Clang/releases/download/22.0.0git-20250928-release/Clang-22.0.0git-20250928.tar.gz
-          # tar -xvf Clang-22.0.0git-20250928.tar.gz
-          # rm -rf Clang-22.0.0git-20250928.tar.gz
-          # cd $GITHUB_WORKSPACE/android-kernel/prebuilts-master/clang/host/linux-x86/
-          # aria2c -s16 -x16 -k1M https://github.com/cctv18/oneplus_sm8650_toolchain/releases/download/LLVM-Clang20-r547379/clang-r547379.zip -o clang.zip &&
-          # unzip -q clang.zip -d clang-r416183b
-          # rm -rf clang.zip
-          # git clone -b 21 --single-branch --depth=1 https://gitlab.com/vantoman/playground-clang.git clang-r416183b
 
       - name: Setup Enviroment
         run: |
           PWDIR=$(pwd)
           cd $GITHUB_WORKSPACE/android-kernel/prebuilts-master/clang/host/linux-x86
-          rm -rf clang-r416183b
-          ln -sfn clang-r584948 clang-r416183b
+          if [ ! -d clang-r416183b ]; then
+            latest_clang=$(ls -d clang-r* | sort -V | tail -n 1)
+            ln -sfn "$latest_clang" clang-r416183b
+          fi
           cd $PWDIR
           export PATH="${{ github.workspace }}/android-kernel/prebuilts-master/clang/host/linux-x86/clang-r416183b/bin:$PATH"
           export PATH="${{ github.workspace }}/android-kernel/prebuilts/build-tools/bin:$PATH"
