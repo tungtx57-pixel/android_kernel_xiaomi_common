@@ -649,6 +649,10 @@ jobs:
             cd "$GITHUB_WORKSPACE/android-kernel/common/"
             git add -vA
             git reset --hard HEAD
+            if [ "$ksu_config" = "y" ]; then
+               echo ">>> Setting up KittiSU (${{ github.event.inputs.KITTISU_BRANCH }})..."
+               curl -LSs "https://raw.githubusercontent.com/terebiko/kittisu/${{ github.event.inputs.KITTISU_BRANCH }}/kernel/setup.sh" | bash -s ${{ github.event.inputs.KITTISU_BRANCH }}
+            fi
             rm -rf "$GITHUB_WORKSPACE/android-kernel/out/android12-5.10"
             echo "CONFIG_KSU=$ksu_config" >> arch/arm64/configs/gki_defconfig
             echo "CONFIG_BUILD_WITH_CCACHE=y" >> arch/arm64/configs/gki_defconfig
