@@ -76,7 +76,7 @@ export LC_ALL=C
 # export SOURCE_DATE_EPOCH=$(git -C ${ROOT_DIR}/${KERNEL_DIR} log -1 --pretty=%ct)
 export KBUILD_BUILD_TIMESTAMP="$(date)"
 export KBUILD_BUILD_HOST=localhost
-export KBUILD_BUILD_USER=dopaemon
+export KBUILD_BUILD_USER=tungtx57-pixel
 export KBUILD_BUILD_VERSION=1
 
 # List of prebuilt directories shell variables to incorporate into PATH

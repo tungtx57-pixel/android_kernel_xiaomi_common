@@ -13,7 +13,7 @@ on:
       KERNEL_GIT:
         description: 'Kernel Source Code'
         required: true
-        default: 'https://github.com/dopaemon/android_kernel_xiaomi_common.git'
+        default: 'https://github.com/tungtx57-pixel/android_kernel_xiaomi_common.git'
       BUILD_DEVICE:
         description: 'Device Target'
         required: true
@@ -36,7 +36,7 @@ on:
       MANIFEST_GIT:
         description: 'Kernel Manifest Git'
         required: true
-        default: 'https://github.com/dopaemon/android_kernel_xiaomi_common.git'
+        default: 'https://github.com/tungtx57-pixel/android_kernel_xiaomi_common.git'
       USING_CCACHE:
         description: 'Using CCACHE'
         required: true
@@ -134,10 +134,10 @@ jobs:
           mkdir -p $GITHUB_WORKSPACE/android-kernel && cd $GITHUB_WORKSPACE/android-kernel
           repo init --depth=1 --u ${{ github.event.inputs.KERNEL_GIT }} -b manifest
           repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
-          git clone -b build --single-branch --depth=1 https://github.com/dopaemon/android_kernel_xiaomi_common.git build
+          git clone -b build --single-branch --depth=1 https://github.com/tungtx57-pixel/android_kernel_xiaomi_common.git build
           rm -rf .git .github .repo common
           rm -rf ./build/_setup_env.sh
-          wget -O ./build/_setup_env.sh https://raw.githubusercontent.com/dopaemon/android_kernel_xiaomi_common/refs/heads/master/.github/scripts/_setup_env.sh
+          wget -O ./build/_setup_env.sh https://raw.githubusercontent.com/tungtx57-pixel/android_kernel_xiaomi_common/refs/heads/master/.github/scripts/_setup_env.sh
           chmod +x ./build/_setup_env.sh
           if [ "$TARGET" != "Both" ]; then
              git clone -b master --depth=1 --single-branch https://github.com/dopaemon/Anykernel3.git ./AnyKernel3
@@ -148,8 +148,8 @@ jobs:
           rm -rf ${{ github.workspace }}/android-kernel/prebuilts/build-tools
           rm -rf ${{ github.workspace }}/android-kernel/prebuilts/kernel-build-tools
           cd ${{ github.workspace }}/android-kernel/prebuilts
-          git clone -b build-tools --single-branch --depth=1 https://github.com/dopaemon/android_kernel_xiaomi_common.git ${{ github.workspace }}/android-kernel/prebuilts/build-tools
-          git clone -b build-tools --single-branch --depth=1 https://github.com/dopaemon/android_kernel_xiaomi_common.git ${{ github.workspace }}/android-kernel/prebuilts/kernel-build-tools
+          git clone -b build-tools --single-branch --depth=1 https://github.com/tungtx57-pixel/android_kernel_xiaomi_common.git ${{ github.workspace }}/android-kernel/prebuilts/build-tools
+          git clone -b build-tools --single-branch --depth=1 https://github.com/tungtx57-pixel/android_kernel_xiaomi_common.git ${{ github.workspace }}/android-kernel/prebuilts/kernel-build-tools
 
       - name: Get SM8450 Trees
         run: |

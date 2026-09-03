@@ -13,7 +13,7 @@ on:
       KERNEL_GIT:
         description: 'Kernel source git'
         required: true
-        default: 'https://github.com/dopaemon/android_kernel_xiaomi_common.git'
+        default: 'https://github.com/tungtx57-pixel/android_kernel_xiaomi_common.git'
       USING_CCACHE:
         description: 'Using CCACHE'
         required: true
@@ -95,7 +95,7 @@ jobs:
           git clone -b build --single-branch --depth=1 "${{ github.event.inputs.KERNEL_GIT }}" build
           rm -rf .git .github .repo common
           rm -rf ./build/_setup_env.sh
-          wget -O ./build/_setup_env.sh https://raw.githubusercontent.com/dopaemon/android_kernel_xiaomi_common/refs/heads/master/.github/scripts/_setup_env.sh
+          wget -O ./build/_setup_env.sh https://raw.githubusercontent.com/tungtx57-pixel/android_kernel_xiaomi_common/refs/heads/master/.github/scripts/_setup_env.sh
           chmod +x ./build/_setup_env.sh
 
           rm -rf "$GITHUB_WORKSPACE/android-kernel/prebuilts/build-tools"

@@ -13,7 +13,7 @@ on:
       KERNEL_GIT:
         description: 'Kernel Source Code'
         required: true
-        default: 'https://github.com/dopaemon/android_kernel_xiaomi_common.git'
+        default: 'https://github.com/tungtx57-pixel/android_kernel_xiaomi_common.git'
       BUILD_DEVICE:
         description: 'Device Target'
         required: true
@@ -36,16 +36,33 @@ on:
       MANIFEST_GIT:
         description: 'Kernel Manifest Git'
         required: true
-        default: 'https://github.com/dopaemon/android_kernel_xiaomi_common.git'
+        default: 'https://github.com/tungtx57-pixel/android_kernel_xiaomi_common.git'
       BUILD_TARGET:
-        description: 'Specify your Build Target (lindroid only KSU)'
+        description: 'Specify your Build Target'
         required: true
-        default: 'KSU'
+        default: 'KittiSU'
         type: choice
         options:
+        - KittiSU
         - NonKSU
         - KSU
         - Both
+      KITTISU_BRANCH:
+        description: 'KittiSU Branch (terebiko/kittisu)'
+        required: true
+        default: 'main'
+        type: choice
+        options:
+        - main
+        - dev
+      ENABLE_SUSFS:
+        description: 'Enable SUSFS Patch (Bật/Tắt SUSFS)'
+        required: true
+        default: 'Enable'
+        type: choice
+        options:
+        - Enable
+        - Disable
       USING_CCACHE:
         description: 'Using CCACHE'
         required: true
@@ -263,10 +280,10 @@ jobs:
           mkdir -p $GITHUB_WORKSPACE/android-kernel && cd $GITHUB_WORKSPACE/android-kernel
           repo init --depth=1 --u ${{ github.event.inputs.KERNEL_GIT }} -b manifest
           repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
-          git clone -b build --single-branch --depth=1 https://github.com/dopaemon/android_kernel_xiaomi_common.git build
+          git clone -b build --single-branch --depth=1 https://github.com/tungtx57-pixel/android_kernel_xiaomi_common.git build
           rm -rf .git .github .repo common
           rm -rf ./build/_setup_env.sh
-          wget -O ./build/_setup_env.sh https://raw.githubusercontent.com/dopaemon/android_kernel_xiaomi_common/refs/heads/master/.github/scripts/_setup_env.sh
+          wget -O ./build/_setup_env.sh https://raw.githubusercontent.com/tungtx57-pixel/android_kernel_xiaomi_common/refs/heads/master/.github/scripts/_setup_env.sh
           chmod +x ./build/_setup_env.sh
           if [ "$TARGET" != "Both" ]; then
              git clone -b master --depth=1 --single-branch https://github.com/dopaemon/Anykernel3.git ./AnyKernel3
@@ -277,17 +294,17 @@ jobs:
           rm -rf ${{ github.workspace }}/android-kernel/prebuilts/build-tools
           rm -rf ${{ github.workspace }}/android-kernel/prebuilts/kernel-build-tools
           cd ${{ github.workspace }}/android-kernel/prebuilts
-          git clone -b build-tools --single-branch --depth=1 https://github.com/dopaemon/android_kernel_xiaomi_common.git ${{ github.workspace }}/android-kernel/prebuilts/build-tools
-          git clone -b build-tools --single-branch --depth=1 https://github.com/dopaemon/android_kernel_xiaomi_common.git ${{ github.workspace }}/android-kernel/prebuilts/kernel-build-tools
+          git clone -b build-tools --single-branch --depth=1 https://github.com/tungtx57-pixel/android_kernel_xiaomi_common.git ${{ github.workspace }}/android-kernel/prebuilts/build-tools
+          git clone -b build-tools --single-branch --depth=1 https://github.com/tungtx57-pixel/android_kernel_xiaomi_common.git ${{ github.workspace }}/android-kernel/prebuilts/kernel-build-tools
 
       - name: Setup Enviroment NonGKI
         run: |
           mkdir -p ${{ github.workspace }}/mkbootimg ${{ github.workspace }}/clang ${{ github.workspace }}/dist ${{ github.workspace }}/images
           wget https://android.googlesource.com/platform/system/tools/mkbootimg/+archive/refs/heads/main.tar.gz -O mkb.tar.gz && tar -zxvf mkb.tar.gz -C ${{ github.workspace }}/mkbootimg
-          git clone -b LKM_Tools --single-branch --depth=1 https://github.com/dopaemon/android_kernel_xiaomi_common.git ${{ github.workspace }}/LKM_Tools
-          wget https://github.com/dopaemon/android_kernel_xiaomi_common/releases/download/Origin-Images/boot-${{ matrix.device }}.img -O ${{ github.workspace }}/images/boot.img
-          wget https://github.com/dopaemon/android_kernel_xiaomi_common/releases/download/Origin-Images/vendor_boot-${{ matrix.device }}.img -O ${{ github.workspace }}/images/vendor_boot.img
-          wget https://github.com/dopaemon/android_kernel_xiaomi_common/releases/download/Origin-Images/vendor_dlkm-${{ matrix.device }}.img -O ${{ github.workspace }}/images/vendor_dlkm.img
+          git clone -b LKM_Tools --single-branch --depth=1 https://github.com/tungtx57-pixel/android_kernel_xiaomi_common.git ${{ github.workspace }}/LKM_Tools
+          wget https://github.com/tungtx57-pixel/android_kernel_xiaomi_common/releases/download/Origin-Images/boot-${{ matrix.device }}.img -O ${{ github.workspace }}/images/boot.img
+          wget https://github.com/tungtx57-pixel/android_kernel_xiaomi_common/releases/download/Origin-Images/vendor_boot-${{ matrix.device }}.img -O ${{ github.workspace }}/images/vendor_boot.img
+          wget https://github.com/tungtx57-pixel/android_kernel_xiaomi_common/releases/download/Origin-Images/vendor_dlkm-${{ matrix.device }}.img -O ${{ github.workspace }}/images/vendor_dlkm.img
 
       - name: Get SM8450 Trees
         run: |
@@ -325,6 +342,13 @@ jobs:
           git fetch origin Rebase
           git reset --hard FETCH_HEAD
           git submodule update --init --recursive
+
+      - name: Setup KittiSU
+        if: github.event.inputs.BUILD_TARGET != 'NonKSU'
+        run: |
+          cd $GITHUB_WORKSPACE/android-kernel/common
+          echo ">>> Setting up KittiSU (${{ github.event.inputs.KITTISU_BRANCH }})..."
+          curl -LSs "https://raw.githubusercontent.com/terebiko/kittisu/${{ github.event.inputs.KITTISU_BRANCH }}/kernel/setup.sh" | bash -s ${{ github.event.inputs.KITTISU_BRANCH }}
 
       - name: Cache Clang
         if: github.event.inputs.USING_CCACHE == 'Enable'
@@ -407,7 +431,7 @@ jobs:
           fi
 
       - name: Build Selected Devices KSU
-        if: (github.event.inputs.BUILD_TARGET == 'KSU' || github.event.inputs.BUILD_TARGET == 'Both') && github.event.inputs.KERNEL_BRANCH == 'Rebase'
+        if: (github.event.inputs.BUILD_TARGET == 'KittiSU' || github.event.inputs.BUILD_TARGET == 'KSU' || github.event.inputs.BUILD_TARGET == 'Both') && github.event.inputs.KERNEL_BRANCH == 'Rebase'
         run: |
           set -euo pipefail
           DEVICE="${{ matrix.device }}"
@@ -524,6 +548,25 @@ jobs:
           rm -rf $GITHUB_WORKSPACE/android-kernel/out/android12-5.10
           echo "CONFIG_KSU=y" >> arch/arm64/configs/gki_defconfig
           echo "CONFIG_BUILD_WITH_CCACHE=y" >> arch/arm64/configs/gki_defconfig
+
+          if [ "${{ github.event.inputs.ENABLE_SUSFS }}" = "Enable" ]; then
+             echo "CONFIG_KSU_SUSFS=y" >> arch/arm64/configs/gki_defconfig
+             echo "CONFIG_KSU_SUSFS_HAS_SU_COMPAT=y" >> arch/arm64/configs/gki_defconfig
+             echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> arch/arm64/configs/gki_defconfig
+             echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y" >> arch/arm64/configs/gki_defconfig
+             echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y" >> arch/arm64/configs/gki_defconfig
+             echo "CONFIG_KSU_SUSFS_SUS_KSTAT=y" >> arch/arm64/configs/gki_defconfig
+             echo "CONFIG_KSU_SUSFS_SUS_OVERLAYFS=y" >> arch/arm64/configs/gki_defconfig
+             echo "CONFIG_KSU_SUSFS_TRY_UMOUNT=y" >> arch/arm64/configs/gki_defconfig
+             echo "CONFIG_KSU_SUSFS_SPOOF_UNAME=y" >> arch/arm64/configs/gki_defconfig
+             echo "CONFIG_KSU_SUSFS_ENABLE_LOG=y" >> arch/arm64/configs/gki_defconfig
+             echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> arch/arm64/configs/gki_defconfig
+             echo "CONFIG_KSU_SUSFS_SUS_SU=y" >> arch/arm64/configs/gki_defconfig
+             VARIANT_NAME="KittiSU-SUSFS"
+          else
+             echo "CONFIG_KSU_SUSFS=n" >> arch/arm64/configs/gki_defconfig
+             VARIANT_NAME="KittiSU"
+          fi
 
           rm ./android/abi_gki_protected_exports_* || true
 
@@ -793,14 +836,14 @@ jobs:
           cd ./common/
 
           if [ "$TARGET" != "Both" ]; then
-             ZIP_NAME="DoraCore-${DEVICE}-KSU-5.10-A12-${BUILD_DATE}.zip"
+             ZIP_NAME="DoraCore-${DEVICE}-${VARIANT_NAME}-5.10-A12-${BUILD_DATE}.zip"
              cd $GITHUB_WORKSPACE/android-kernel/AnyKernel3
              cp -r $GITHUB_WORKSPACE/android-kernel/out/arch/arm64/boot/Image ./Image
              zip -r9 "$ZIP_NAME" *
              mv "$ZIP_NAME" $GITHUB_WORKSPACE/
           else
              cd $GITHUB_WORKSPACE/android-kernel/AnyKernel3
-             cp -r $GITHUB_WORKSPACE/android-kernel/out/arch/arm64/boot/Image ./Image-kernelsu
+             cp -r $GITHUB_WORKSPACE/android-kernel/out/arch/arm64/boot/Image ./Image-kittisu
           fi
 
       - name: Build Selected Devices NonKSU
