@@ -499,6 +499,14 @@ jobs:
             kill "$KEEPALIVE_PID" 2>/dev/null || true
             wait "$KEEPALIVE_PID" 2>/dev/null || true
 
+            if [ "$MAKE_RC" -ne 0 ]; then
+               echo "=================================================="
+               echo "=== MAKE FAILED! LAST 100 LINES OF LOG: ==="
+               echo "=================================================="
+               tail -n 100 "$log_file" || true
+               echo "=================================================="
+            fi
+
             return "$MAKE_RC"
           }
 
@@ -645,17 +653,15 @@ jobs:
 
             if [ "$susfs_config" = "y" ]; then
                echo "CONFIG_KSU_SUSFS=y" >> arch/arm64/configs/gki_defconfig
-               echo "CONFIG_KSU_SUSFS_HAS_SU_COMPAT=y" >> arch/arm64/configs/gki_defconfig
+               echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> arch/arm64/configs/gki_defconfig
                echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> arch/arm64/configs/gki_defconfig
-               echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y" >> arch/arm64/configs/gki_defconfig
-               echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y" >> arch/arm64/configs/gki_defconfig
                echo "CONFIG_KSU_SUSFS_SUS_KSTAT=y" >> arch/arm64/configs/gki_defconfig
-               echo "CONFIG_KSU_SUSFS_SUS_OVERLAYFS=y" >> arch/arm64/configs/gki_defconfig
-               echo "CONFIG_KSU_SUSFS_TRY_UMOUNT=y" >> arch/arm64/configs/gki_defconfig
                echo "CONFIG_KSU_SUSFS_SPOOF_UNAME=y" >> arch/arm64/configs/gki_defconfig
                echo "CONFIG_KSU_SUSFS_ENABLE_LOG=y" >> arch/arm64/configs/gki_defconfig
+               echo "CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y" >> arch/arm64/configs/gki_defconfig
+               echo "CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y" >> arch/arm64/configs/gki_defconfig
                echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> arch/arm64/configs/gki_defconfig
-               echo "CONFIG_KSU_SUSFS_SUS_SU=y" >> arch/arm64/configs/gki_defconfig
+               echo "CONFIG_KSU_SUSFS_SUS_MAP=y" >> arch/arm64/configs/gki_defconfig
             else
                echo "CONFIG_KSU_SUSFS=n" >> arch/arm64/configs/gki_defconfig
             fi
