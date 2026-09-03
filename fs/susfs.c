@@ -1464,3 +1464,12 @@ void susfs_init(void) {
 /* No module exit is needed becuase it should never be a loadable kernel module */
 //void __init susfs_exit(void)
 
+
+/* Stub for ksu_handle_devpts - required by dopaemon kernel hooks in fs/devpts/inode.c
+ * KittiSU does not provide this function (it's KSU-Next specific),
+ * so we provide a no-op implementation here.
+ */
+int ksu_handle_devpts(struct inode *inode)
+{
+	return 0;
+}
