@@ -804,6 +804,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Send Telegram
+        if: ${{ secrets.TG_SENDER_TG_BOT_TOKEN != '' && secrets.TG_SENDER_TG_CHAT_ID != '' }}
         uses: BorisTestov/tg_sender_action@latest
         continue-on-error: true
         env:
