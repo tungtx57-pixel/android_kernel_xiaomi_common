@@ -349,12 +349,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: android-kernel/prebuilts-master/clang/host/linux-x86
-          key: clang-r450784e-v2
+          key: clang-main-kernel-v1
 
       - name: Clone Clang if cache missed
         if: steps.cache-clang.outputs.cache-hit != 'true'
         run: |
-          git clone -b master-kernel-build-2022 \
+          git clone -b main-kernel \
                     --single-branch \
                     --depth=1 \
                     https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 \
