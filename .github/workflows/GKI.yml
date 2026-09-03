@@ -354,11 +354,15 @@ jobs:
       - name: Clone Clang if cache missed
         if: steps.cache-clang.outputs.cache-hit != 'true'
         run: |
-          git clone -b main-kernel \
-                    --single-branch \
-                    --depth=1 \
-                    https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 \
-                    $GITHUB_WORKSPACE/android-kernel/prebuilts-master/clang/host/linux-x86
+          git config --global http.postBuffer 524288000
+          git config --global http.version HTTP/1.1
+          for i in 1 2 3 4 5; do
+            git clone -b main-kernel \
+                      --single-branch \
+                      --depth=1 \
+                      https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 \
+                      $GITHUB_WORKSPACE/android-kernel/prebuilts-master/clang/host/linux-x86 && break || sleep 5
+          done
 
       - name: Setup Enviroment
         run: |
