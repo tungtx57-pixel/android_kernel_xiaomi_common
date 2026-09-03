@@ -466,28 +466,18 @@ jobs:
           touch ld-wrapper
           chmod +x *-wrapper
           echo '#!/bin/bash' > cc-wrapper
-          echo 'export LD_PRELOAD="'$PRELOAD_LIBS'"' >> cc-wrapper
-          echo 'export FAKESTAT="'$FAKESTAT'"' >> cc-wrapper
-          echo 'export FAKETIME="'$FAKETIME'"' >> cc-wrapper
           echo 'sccache clang "$@"' >> cc-wrapper
           echo '#!/bin/bash' > ld-wrapper
-          echo 'export LD_PRELOAD="'$PRELOAD_LIBS'"' >> ld-wrapper
-          echo 'export FAKESTAT="'$FAKESTAT'"' >> ld-wrapper
-          echo 'export FAKETIME="'$FAKETIME'"' >> ld-wrapper
           echo 'ld.lld "$@"' >> ld-wrapper
           touch test-wrapper.sh
           chmod +x test-wrapper.sh
           echo '#!/bin/bash' > test-wrapper.sh
-          echo 'export LD_PRELOAD="'$PRELOAD_LIBS'"' >> test-wrapper.sh
-          echo 'export FAKESTAT="'$FAKESTAT'"' >> test-wrapper.sh
-          echo 'export FAKETIME="'$FAKETIME'"' >> test-wrapper.sh
           echo 'echo ">>> Wrapper check enviroment."' >> test-wrapper.sh
           echo 'exec "$@"' >> test-wrapper.sh
           chmod +x test-wrapper.sh
           ./test-wrapper.sh date
           ./test-wrapper.sh stat ./Makefile
           chmod +x cc-wrapper ld-wrapper
-          LD_PRELOAD=$PRELOAD_LIBS stat ./Makefile
 
           rm ./android/abi_gki_protected_exports_* || true
 
