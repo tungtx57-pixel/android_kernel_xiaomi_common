@@ -349,9 +349,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: android-kernel/prebuilts-master/clang/host/linux-x86
-          key: clang-r450784e-v1
-          restore-keys: |
-            clang-r450784e-
+          key: clang-r450784e-v2
 
       - name: Clone Clang if cache missed
         if: steps.cache-clang.outputs.cache-hit != 'true'
@@ -482,27 +480,17 @@ jobs:
             local log_file="$1"
             shift
 
-            "$@" 2>&1 | tee "$log_file" &
-            MAKE_PID=$!
+            set -o pipefail
+            "$@" 2>&1 | tee "$log_file"
+            MAKE_RC=$?
 
             log_resource_snapshot
 
-            while kill -0 "$MAKE_PID" 2>/dev/null; do
-              log_resource_snapshot
-              sleep 30
-            done &
-            KEEPALIVE_PID=$!
-
-            wait "$MAKE_PID"
-            MAKE_RC=$?
-            kill "$KEEPALIVE_PID" 2>/dev/null || true
-            wait "$KEEPALIVE_PID" 2>/dev/null || true
-
             if [ "$MAKE_RC" -ne 0 ]; then
                echo "=================================================="
-               echo "=== MAKE FAILED! LAST 100 LINES OF LOG: ==="
+               echo "=== MAKE FAILED! LAST 150 LINES OF BUILD LOG ($log_file): ==="
                echo "=================================================="
-               tail -n 100 "$log_file" || true
+               tail -n 150 "$log_file" || true
                echo "=================================================="
             fi
 
