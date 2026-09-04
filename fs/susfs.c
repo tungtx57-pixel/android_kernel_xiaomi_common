@@ -24,8 +24,6 @@
 #include "fuse/fuse_i.h"
 #include "mount.h"
 
-DEFINE_STATIC_KEY_FALSE(ksu_init_rc_hook_key_false);
-DEFINE_STATIC_KEY_FALSE(ksu_input_hook_key_false);
 
 extern bool susfs_is_current_ksu_domain(void);
 extern void setup_selinux(const char *domain, struct cred *cred);
@@ -1452,8 +1450,6 @@ void susfs_start_sdcard_monitor_fn(void) {
 
 /* susfs_init */
 void susfs_init(void) {
-	static_branch_enable(&ksu_init_rc_hook_key_false);
-	static_branch_enable(&ksu_input_hook_key_false);
 	static_branch_enable(&susfs_set_sdcard_android_data_decrypted_key_false);
 	static_branch_disable(&susfs_set_uname_key_true);
 	static_branch_disable(&susfs_avc_log_spoofing_key_true);
@@ -1465,11 +1461,3 @@ void susfs_init(void) {
 //void __init susfs_exit(void)
 
 
-/* Stub for ksu_handle_devpts - required by dopaemon kernel hooks in fs/devpts/inode.c
- * KittiSU does not provide this function (it's KSU-Next specific),
- * so we provide a no-op implementation here.
- */
-int ksu_handle_devpts(struct inode *inode)
-{
-	return 0;
-}
