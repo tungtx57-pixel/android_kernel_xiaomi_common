@@ -653,9 +653,6 @@ jobs:
             fi
             rm -rf "$GITHUB_WORKSPACE/android-kernel/out/android12-5.10"
             echo "CONFIG_KSU=$ksu_config" >> arch/arm64/configs/gki_defconfig
-            if [ "$ksu_config" = "y" ]; then
-               echo "CONFIG_KSU_MANUAL_HOOK=y" >> arch/arm64/configs/gki_defconfig
-            fi
             echo "CONFIG_BUILD_WITH_CCACHE=y" >> arch/arm64/configs/gki_defconfig
 
             if [ "$susfs_config" = "y" ]; then
