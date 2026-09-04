@@ -183,7 +183,6 @@ int vfs_fstat(int fd, struct kstat *stat)
 	return error;
 }
 
-#endif
 
 /**
  * vfs_statx - Get basic and extra attributes by filename
