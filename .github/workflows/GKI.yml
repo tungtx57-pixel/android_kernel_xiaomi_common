@@ -17,7 +17,7 @@ on:
       BUILD_DEVICE:
         description: 'Device Target'
         required: true
-        default: 'mayfly'
+        default: 'all'
         type: choice
         options:
         - all
@@ -50,15 +50,15 @@ on:
       KITTISU_BRANCH:
         description: 'KittiSU Branch (terebiko/kittisu)'
         required: true
-        default: 'main'
+        default: 'dev'
         type: choice
         options:
-        - main
         - dev
+        - main
       ENABLE_SUSFS:
         description: 'Enable SUSFS Patch (Bật/Tắt SUSFS)'
         required: true
-        default: 'Enable'
+        default: 'Disable'
         type: choice
         options:
         - Enable
@@ -250,14 +250,6 @@ jobs:
           echo "===== Initial Total Disk Space in GB ====="
           df -BG
 
-      # - name: Clean-up
-        # uses: rokibhasansagar/slimhub_actions@main
-
-      # - name: Check Disk Space After Cleanup
-        # run: |
-          # echo "===== Total Disk Space After Cleanup in GB ====="
-          # df -BG
-
       - name: Build Environment
         run: |
           TARGET="${{ github.event.inputs.BUILD_TARGET }}"
@@ -272,7 +264,7 @@ jobs:
             curl bison flex make binutils git perl gcc python3 \
             python-is-python3 bc libssl-dev libelf-dev \
             bc aria2 zip unzip ccache binutils-aarch64-linux-gnu \
-            tar which wget zip unzip
+            tar which wget zip unzip patch
           cd $GITHUB_WORKSPACE
           sudo wget -O /usr/bin/repo http://commondatastorage.googleapis.com/git-repo-downloads/repo
           sudo chmod +x /usr/bin/repo
@@ -320,13 +312,6 @@ jobs:
           git fetch origin Rebase
           git reset --hard FETCH_HEAD
           git submodule update --init --recursive
-
-      - name: Setup KittiSU
-        if: github.event.inputs.BUILD_TARGET != 'NonKSU'
-        run: |
-          cd $GITHUB_WORKSPACE/android-kernel/common
-          echo ">>> Setting up KittiSU (${{ github.event.inputs.KITTISU_BRANCH }})..."
-          curl -LSs "https://raw.githubusercontent.com/terebiko/kittisu/${{ github.event.inputs.KITTISU_BRANCH }}/kernel/setup.sh" | bash -s ${{ github.event.inputs.KITTISU_BRANCH }}
 
       - name: Get SM8450 Trees
         run: |
@@ -640,17 +625,33 @@ jobs:
             echo "Using Clang: $(clang --version | head -n 1)"
             echo "Using LLD: $(ld.lld --version | head -n 1)"
 
-
             unset DTC
             export DTC="${{ github.workspace }}/android-kernel/prebuilts/build-tools/bin/dtc"
 
             cd "$GITHUB_WORKSPACE/android-kernel/common/"
-            git add -vA
             git reset --hard HEAD
+            git clean -fd
+
             if [ "$ksu_config" = "y" ]; then
                echo ">>> Setting up KittiSU (${{ github.event.inputs.KITTISU_BRANCH }})..."
                curl -LSs "https://raw.githubusercontent.com/terebiko/kittisu/${{ github.event.inputs.KITTISU_BRANCH }}/kernel/setup.sh" | bash -s ${{ github.event.inputs.KITTISU_BRANCH }}
             fi
+
+            if [ "$susfs_config" = "y" ]; then
+               echo ">>> Patching SUSFS 2.3.0 for Linux 5.10 GKI..."
+               rm -rf "$GITHUB_WORKSPACE/android-kernel/susfs4ksu"
+               git clone -b gki-android12-5.10 --depth=1 https://gitlab.com/simonpunk/susfs4ksu.git "$GITHUB_WORKSPACE/android-kernel/susfs4ksu" || \
+               git clone -b gki-android12-5.10 --depth=1 https://github.com/sidoll/susfs4ksu.git "$GITHUB_WORKSPACE/android-kernel/susfs4ksu"
+
+               cp -f "$GITHUB_WORKSPACE/android-kernel/susfs4ksu/kernel_patches/fs/susfs.c" fs/
+               cp -f "$GITHUB_WORKSPACE/android-kernel/susfs4ksu/kernel_patches/include/linux/susfs.h" include/linux/
+               cp -f "$GITHUB_WORKSPACE/android-kernel/susfs4ksu/kernel_patches/include/linux/susfs_def.h" include/linux/
+
+               if [ -f "$GITHUB_WORKSPACE/android-kernel/susfs4ksu/kernel_patches/5.10_gki_susfs.patch" ]; then
+                  patch -p1 < "$GITHUB_WORKSPACE/android-kernel/susfs4ksu/kernel_patches/5.10_gki_susfs.patch" || true
+               fi
+            fi
+
             rm -rf "$GITHUB_WORKSPACE/android-kernel/out/android12-5.10"
             echo "CONFIG_KSU=$ksu_config" >> arch/arm64/configs/gki_defconfig
             echo "CONFIG_BUILD_WITH_CCACHE=y" >> arch/arm64/configs/gki_defconfig
