@@ -17,7 +17,7 @@ on:
       BUILD_DEVICE:
         description: 'Device Target'
         required: true
-        default: 'all'
+        default: 'mayfly'
         type: choice
         options:
         - all
@@ -58,7 +58,7 @@ on:
       ENABLE_SUSFS:
         description: 'Enable SUSFS Patch (Bật/Tắt SUSFS)'
         required: true
-        default: 'Disable'
+        default: 'Enable'
         type: choice
         options:
         - Enable
@@ -668,6 +668,7 @@ jobs:
                echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> arch/arm64/configs/gki_defconfig
                echo "CONFIG_KSU_SUSFS_SUS_MAP=y" >> arch/arm64/configs/gki_defconfig
             else
+               echo "CONFIG_KSU_TRACEPOINT_HOOK=y" >> arch/arm64/configs/gki_defconfig
                echo "CONFIG_KSU_SUSFS=n" >> arch/arm64/configs/gki_defconfig
             fi
 
