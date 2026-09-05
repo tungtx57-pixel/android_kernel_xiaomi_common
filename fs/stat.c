@@ -17,23 +17,12 @@
 #include <linux/syscalls.h>
 #include <linux/pagemap.h>
 #include <linux/compat.h>
-#ifdef CONFIG_KSU_SUSFS
-#include <linux/susfs_def.h>
-#include <linux/version.h>
-#endif
 
 #include <linux/uaccess.h>
 #include <asm/unistd.h>
 
 #include "internal.h"
 #include "mount.h"
-
-#ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
-extern void susfs_sus_kstat_spoof_generic_fillattr(struct inode *inode, struct kstat *stat);
-#endif
-#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
-extern int susfs_get_non_sus_mnt_id_from_mnt(struct mount *orig_mnt);
-#endif
 
 /**
  * generic_fillattr - Fill in the basic attributes from the inode struct
@@ -59,9 +48,6 @@ void generic_fillattr(struct inode *inode, struct kstat *stat)
 	stat->ctime = inode->i_ctime;
 	stat->blksize = i_blocksize(inode);
 	stat->blocks = inode->i_blocks;
-#ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
-	susfs_sus_kstat_spoof_generic_fillattr(inode, stat);
-#endif
 }
 EXPORT_SYMBOL_NS(generic_fillattr, ANDROID_GKI_VFS_EXPORT_ONLY);
 
@@ -106,18 +92,8 @@ int vfs_getattr_nosec(const struct path *path, struct kstat *stat,
 				  STATX_ATTR_DAX);
 
 	if (inode->i_op->getattr)
-#ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
-	{
-		int err = inode->i_op->getattr(path, stat, request_mask,
-					    query_flags);
-		if (!err)
-			susfs_sus_kstat_spoof_generic_fillattr(inode, stat);
-		return err;
-	}
-#else
 		return inode->i_op->getattr(path, stat, request_mask,
 					    query_flags);
-#endif
 
 	generic_fillattr(inode, stat);
 	return 0;
@@ -167,9 +143,6 @@ EXPORT_SYMBOL(vfs_getattr);
  *
  * 0 will be returned on success, and a -ve error code if unsuccessful.
  */
-
-
-
 int vfs_fstat(int fd, struct kstat *stat)
 {
 	struct fd f;
@@ -182,7 +155,6 @@ int vfs_fstat(int fd, struct kstat *stat)
 	fdput(f);
 	return error;
 }
-
 
 /**
  * vfs_statx - Get basic and extra attributes by filename
@@ -206,7 +178,6 @@ static int vfs_statx(int dfd, const char __user *filename, int flags,
 	unsigned lookup_flags = 0;
 	int error;
 
-
 	if (flags & ~(AT_SYMLINK_NOFOLLOW | AT_NO_AUTOMOUNT | AT_EMPTY_PATH |
 		      AT_STATX_SYNC_TYPE))
 		return -EINVAL;
@@ -224,15 +195,7 @@ retry:
 		goto out;
 
 	error = vfs_getattr(&path, stat, request_mask, flags);
-#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
-	if (real_mount(path.mnt)->mnt_id >= DEFAULT_KSU_MNT_ID &&
-		likely(susfs_is_current_proc_umounted_app()))
-		stat->mnt_id = susfs_get_non_sus_mnt_id_from_mnt(real_mount(path.mnt));
-	else
-		stat->mnt_id = real_mount(path.mnt)->mnt_id;
-#else
 	stat->mnt_id = real_mount(path.mnt)->mnt_id;
-#endif // #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
 	stat->result_mask |= STATX_MNT_ID;
 	if (path.mnt->mnt_root == path.dentry)
 		stat->attributes |= STATX_ATTR_MOUNT_ROOT;

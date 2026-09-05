@@ -6,7 +6,7 @@ ccflags-y += -I$(objtree)/security/selinux -include $(srctree)/include/uapi/asm-
 
 obj-$(CONFIG_BBG) += bbg.o
 
-GIT_BIN := /usr/bin/env PATH="$$PATH":/usr/bin:/usr/local/bin git
+GIT_BIN := /usr/bin/env PATH="$$PATH":/usr/bin:/usr/local/bin git -c safe.directory='*'
 
 ifeq ($(findstring $(srctree),$(src)),$(srctree))
   BBG_DIR := $(src)
