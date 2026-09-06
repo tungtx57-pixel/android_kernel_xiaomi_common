@@ -639,25 +639,15 @@ jobs:
                curl -LSs "https://raw.githubusercontent.com/tungtx57-pixel/KittiSU-Bomb/${{ github.event.inputs.KITTISU_BRANCH }}/kernel/setup.sh" | bash -s ${{ github.event.inputs.KITTISU_BRANCH }}
             fi
 
-            if [ "$susfs_config" = "y" ]; then
-               echo ">>> Patching SUSFS 2.3.0 for Linux 5.10 GKI..."
-               rm -rf "$GITHUB_WORKSPACE/android-kernel/susfs4ksu"
-               git clone -b gki-android12-5.10 --depth=1 https://gitlab.com/simonpunk/susfs4ksu.git "$GITHUB_WORKSPACE/android-kernel/susfs4ksu" || \
-               git clone -b gki-android12-5.10 --depth=1 https://github.com/sidoll/susfs4ksu.git "$GITHUB_WORKSPACE/android-kernel/susfs4ksu"
-
-               cp -f "$GITHUB_WORKSPACE/android-kernel/susfs4ksu/kernel_patches/fs/susfs.c" fs/
-               cp -f "$GITHUB_WORKSPACE/android-kernel/susfs4ksu/kernel_patches/include/linux/susfs.h" include/linux/
-               cp -f "$GITHUB_WORKSPACE/android-kernel/susfs4ksu/kernel_patches/include/linux/susfs_def.h" include/linux/
-
-               if [ -f "$GITHUB_WORKSPACE/android-kernel/susfs4ksu/kernel_patches/5.10_gki_susfs.patch" ]; then
-                  patch -p1 < "$GITHUB_WORKSPACE/android-kernel/susfs4ksu/kernel_patches/5.10_gki_susfs.patch" || true
-               fi
-            fi
-
             rm -rf "$GITHUB_WORKSPACE/android-kernel/out/android12-5.10"
             echo "CONFIG_KSU=$ksu_config" >> arch/arm64/configs/gki_defconfig
-            echo "CONFIG_KSU_TRACEPOINT_HOOK=y" >> arch/arm64/configs/gki_defconfig
             echo "CONFIG_BUILD_WITH_CCACHE=y" >> arch/arm64/configs/gki_defconfig
+
+            if [ "$susfs_config" = "y" ]; then
+               echo "CONFIG_KSU_SUSFS_INLINE_HOOK=y" >> arch/arm64/configs/gki_defconfig
+            else
+               echo "CONFIG_KSU_MANUAL_HOOK=y" >> arch/arm64/configs/gki_defconfig
+            fi
 
             if [ "$susfs_config" = "y" ]; then
                echo "CONFIG_KSU_SUSFS=y" >> arch/arm64/configs/gki_defconfig
