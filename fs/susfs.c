@@ -1450,7 +1450,7 @@ void susfs_start_sdcard_monitor_fn(void) {
 }
 
 /* susfs_init */
-void susfs_init(void) {
+int __init susfs_init(void) {
 	static_branch_enable(&ksu_init_rc_hook_key_false);
 	static_branch_enable(&ksu_input_hook_key_false);
 	static_branch_enable(&susfs_set_sdcard_android_data_decrypted_key_false);
@@ -1464,6 +1464,7 @@ void susfs_init(void) {
 	static_branch_disable(&susfs_set_fake_cmdline_or_bootconfig_key_true);
 #endif
 	SUSFS_LOGI("susfs is initialized! version: " SUSFS_VERSION " \n");
+	return 0;
 }
 core_initcall(susfs_init);
 
