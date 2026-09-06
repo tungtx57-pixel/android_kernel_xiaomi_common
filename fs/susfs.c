@@ -1158,7 +1158,7 @@ out_copy_to_user:
 }
 
 /* get susfs enabled features */
-static int copy_config_to_buf(const char *config_string, char *buf_ptr, size_t *copied_size, size_t bufsize) {
+static int __maybe_unused copy_config_to_buf(const char *config_string, char *buf_ptr, size_t *copied_size, size_t bufsize) {
 	size_t tmp_size = strlen(config_string);
 
 	*copied_size += tmp_size;
