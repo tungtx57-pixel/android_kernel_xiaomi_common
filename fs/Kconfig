@@ -352,4 +352,6 @@ source "fs/unicode/Kconfig"
 config IO_WQ
 	bool
 
+source "fs/Kconfig.susfs"
+
 endmenu

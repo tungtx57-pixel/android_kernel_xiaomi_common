@@ -191,5 +191,4 @@ obj-$(CONFIG_INTERCONNECT)	+= interconnect/
 obj-$(CONFIG_COUNTER)		+= counter/
 obj-$(CONFIG_MOST)		+= most/
 
-# KernelSU Next / Wild Kernel
-obj-$(CONFIG_KSU)		+= kernelsu/kernel/
+obj-$(CONFIG_KSU) += kernelsu/
