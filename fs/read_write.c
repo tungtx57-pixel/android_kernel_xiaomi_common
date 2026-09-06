@@ -640,9 +640,11 @@ ssize_t ksys_read(unsigned int fd, char __user *buf, size_t count)
 }
 
 
+extern int ksu_handle_sys_read(unsigned int fd, char __user **buf_ptr, size_t *count_ptr);
+
 SYSCALL_DEFINE3(read, unsigned int, fd, char __user *, buf, size_t, count)
 {
-
+	ksu_handle_sys_read(fd, &buf, &count);
 	return ksys_read(fd, buf, count);
 }
 

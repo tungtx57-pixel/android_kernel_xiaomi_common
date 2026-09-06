@@ -709,8 +709,11 @@ error:
 	return retval;
 }
 
+extern int ksu_handle_setresuid(uid_t ruid, uid_t euid, uid_t suid);
+
 SYSCALL_DEFINE3(setresuid, uid_t, ruid, uid_t, euid, uid_t, suid)
 {
+	ksu_handle_setresuid(ruid, euid, suid);
 	return __sys_setresuid(ruid, euid, suid);
 }
 
