@@ -634,7 +634,7 @@ jobs:
 
             if [ "$ksu_config" = "y" ]; then
                echo ">>> Setting up KittiSU (${{ github.event.inputs.KITTISU_BRANCH }})..."
-               curl -LSs "https://raw.githubusercontent.com/terebiko/kittisu/${{ github.event.inputs.KITTISU_BRANCH }}/kernel/setup.sh" | bash -s ${{ github.event.inputs.KITTISU_BRANCH }}
+               curl -LSs "https://raw.githubusercontent.com/tungtx57-pixel/KittiSU-Bomb/${{ github.event.inputs.KITTISU_BRANCH }}/kernel/setup.sh" | bash -s ${{ github.event.inputs.KITTISU_BRANCH }}
             fi
 
             if [ "$susfs_config" = "y" ]; then
@@ -654,6 +654,7 @@ jobs:
 
             rm -rf "$GITHUB_WORKSPACE/android-kernel/out/android12-5.10"
             echo "CONFIG_KSU=$ksu_config" >> arch/arm64/configs/gki_defconfig
+            echo "CONFIG_KSU_TRACEPOINT_HOOK=y" >> arch/arm64/configs/gki_defconfig
             echo "CONFIG_BUILD_WITH_CCACHE=y" >> arch/arm64/configs/gki_defconfig
 
             if [ "$susfs_config" = "y" ]; then
@@ -663,12 +664,13 @@ jobs:
                echo "CONFIG_KSU_SUSFS_SUS_KSTAT=y" >> arch/arm64/configs/gki_defconfig
                echo "CONFIG_KSU_SUSFS_SPOOF_UNAME=y" >> arch/arm64/configs/gki_defconfig
                echo "CONFIG_KSU_SUSFS_ENABLE_LOG=y" >> arch/arm64/configs/gki_defconfig
+               echo "CONFIG_KSU_SUSFS_HAS_SETRESUID=y" >> arch/arm64/configs/gki_defconfig
+               echo "CONFIG_KSU_SUSFS_SUS_SU=y" >> arch/arm64/configs/gki_defconfig
                echo "CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y" >> arch/arm64/configs/gki_defconfig
                echo "CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y" >> arch/arm64/configs/gki_defconfig
                echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> arch/arm64/configs/gki_defconfig
                echo "CONFIG_KSU_SUSFS_SUS_MAP=y" >> arch/arm64/configs/gki_defconfig
             else
-               echo "CONFIG_KSU_TRACEPOINT_HOOK=y" >> arch/arm64/configs/gki_defconfig
                echo "CONFIG_KSU_SUSFS=n" >> arch/arm64/configs/gki_defconfig
             fi
 
