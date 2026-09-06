@@ -60,7 +60,7 @@ typedef void (*panel_event_notifier_handler)(enum panel_event_notifier_tag tag,
 				struct panel_event_notification *notification,
 					void *pvt_data);
 
-#if IS_ENABLED(CONFIG_QCOM_PANEL_EVENT_NOTIFIER)
+#if IS_REACHABLE(CONFIG_QCOM_PANEL_EVENT_NOTIFIER)
 void *panel_event_notifier_register(enum panel_event_notifier_tag tag,
 		enum panel_event_notifier_client client_handle,
 		struct drm_panel *panel,

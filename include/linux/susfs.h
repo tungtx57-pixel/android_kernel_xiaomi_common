@@ -235,7 +235,15 @@ void susfs_show_version(void __user **user_info);
 
 void susfs_start_sdcard_monitor_fn(void);
 
-/* susfs_init */
-void susfs_init(void);
+#ifdef CONFIG_KSU_SUSFS
+extern bool susfs_is_current_ksu_domain(void);
+extern bool susfs_is_current_zygote_domain(void);
+extern bool susfs_is_current_init_domain(void);
+#else
+static inline bool susfs_is_current_ksu_domain(void) { return false; }
+static inline bool susfs_is_current_zygote_domain(void) { return false; }
+static inline bool susfs_is_current_init_domain(void) { return false; }
+#endif
 
 #endif
+
