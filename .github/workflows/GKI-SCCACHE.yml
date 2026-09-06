@@ -458,12 +458,8 @@ jobs:
              echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> arch/arm64/configs/gki_defconfig
              echo "CONFIG_KSU_SUSFS_SUS_SU=y" >> arch/arm64/configs/gki_defconfig
              VARIANT_NAME="KittiSU-SUSFS"
-          elif [ "${{ github.event.inputs.KERNEL_BRANCH }}" = "Rebase-CAF" ]; then
-             echo "CONFIG_KSU_MANUAL_HOOK=y" >> arch/arm64/configs/gki_defconfig
-             echo "CONFIG_KSU_SUSFS=n" >> arch/arm64/configs/gki_defconfig
-             VARIANT_NAME="KittiSU"
           else
-             echo "CONFIG_KSU_TRACEPOINT_HOOK=y" >> arch/arm64/configs/gki_defconfig
+             echo "CONFIG_KSU_MANUAL_HOOK=y" >> arch/arm64/configs/gki_defconfig
              echo "CONFIG_KSU_SUSFS=n" >> arch/arm64/configs/gki_defconfig
              VARIANT_NAME="KittiSU"
           fi
