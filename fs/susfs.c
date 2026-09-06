@@ -1173,7 +1173,7 @@ static int copy_config_to_buf(const char *config_string, char *buf_ptr, size_t *
 void susfs_get_enabled_features(void __user **user_info) {
 	struct st_susfs_enabled_features *info = (struct st_susfs_enabled_features *)kzalloc(sizeof(struct st_susfs_enabled_features), GFP_KERNEL);
 	char *buf_ptr = NULL;
-	size_t copied_size = 0;
+	size_t __maybe_unused copied_size = 0;
 
 	if (!info) {
 		info->err = -ENOMEM;
@@ -1455,9 +1455,15 @@ void susfs_init(void) {
 	static_branch_enable(&ksu_init_rc_hook_key_false);
 	static_branch_enable(&ksu_input_hook_key_false);
 	static_branch_enable(&susfs_set_sdcard_android_data_decrypted_key_false);
+#ifdef CONFIG_KSU_SUSFS_SPOOF_UNAME
 	static_branch_disable(&susfs_set_uname_key_true);
+#endif
+#ifdef CONFIG_KSU_SUSFS_ENABLE_AVC_LOG_SPOOFING
 	static_branch_disable(&susfs_avc_log_spoofing_key_true);
+#endif
+#ifdef CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG
 	static_branch_disable(&susfs_set_fake_cmdline_or_bootconfig_key_true);
+#endif
 	SUSFS_LOGI("susfs is initialized! version: " SUSFS_VERSION " \n");
 }
 
