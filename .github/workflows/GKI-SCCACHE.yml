@@ -302,13 +302,14 @@ jobs:
       - name: Clone Kernel if cache missed
         if: steps.cache-kernel.outputs.cache-hit != 'true'
         run: |
+          rm -rf android-kernel/common
           git clone -b ${{ github.event.inputs.KERNEL_BRANCH }} --recurse-submodules -j$(nproc --all) --single-branch --no-tags ${{ github.event.inputs.KERNEL_GIT }} android-kernel/common
 
       - name: Sync Kernel if cache complete
         if: steps.cache-kernel.outputs.cache-hit == 'true'
         run: |
           cd android-kernel/common
-          git fetch origin Rebase
+          git fetch origin ${{ github.event.inputs.KERNEL_BRANCH }}
           git reset --hard FETCH_HEAD
           git submodule update --init --recursive
 
