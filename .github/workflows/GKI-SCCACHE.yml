@@ -10,6 +10,7 @@ on:
         type: choice
         options:
         - Rebase
+        - Rebase-CAF
       KERNEL_GIT:
         description: 'Kernel Source Code'
         required: true
@@ -412,7 +413,7 @@ jobs:
           echo "FAKETIME=$FAKETIME" >> $GITHUB_ENV
 
       - name: Build Selected Devices KSU
-        if: (github.event.inputs.BUILD_TARGET == 'KittiSU' || github.event.inputs.BUILD_TARGET == 'KSU' || github.event.inputs.BUILD_TARGET == 'Both') && github.event.inputs.KERNEL_BRANCH == 'Rebase'
+        if: (github.event.inputs.BUILD_TARGET == 'KittiSU' || github.event.inputs.BUILD_TARGET == 'KSU' || github.event.inputs.BUILD_TARGET == 'Both') && (github.event.inputs.KERNEL_BRANCH == 'Rebase' || github.event.inputs.KERNEL_BRANCH == 'Rebase-CAF')
         run: |
           set -e
           DEVICE="${{ matrix.device }}"
@@ -536,7 +537,7 @@ jobs:
           fi
 
       - name: Build Selected Devices NonKSU
-        if: (github.event.inputs.BUILD_TARGET == 'NonKSU' || github.event.inputs.BUILD_TARGET == 'Both') && github.event.inputs.KERNEL_BRANCH == 'Rebase'
+        if: (github.event.inputs.BUILD_TARGET == 'NonKSU' || github.event.inputs.BUILD_TARGET == 'Both') && (github.event.inputs.KERNEL_BRANCH == 'Rebase' || github.event.inputs.KERNEL_BRANCH == 'Rebase-CAF')
         run: |
           set -e
           DEVICE="${{ matrix.device }}"

@@ -10,6 +10,7 @@ on:
         type: choice
         options:
         - Rebase
+        - Rebase-CAF
       KERNEL_GIT:
         description: 'Kernel Source Code'
         required: true
@@ -414,7 +415,7 @@ jobs:
           fi
 
       - name: Build Selected Device Variants
-        if: github.event.inputs.KERNEL_BRANCH == 'Rebase'
+        if: github.event.inputs.KERNEL_BRANCH == 'Rebase' || github.event.inputs.KERNEL_BRANCH == 'Rebase-CAF'
         run: |
           set -euo pipefail
           DEVICE="${{ matrix.device }}"
