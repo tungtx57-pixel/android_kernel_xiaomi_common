@@ -634,7 +634,10 @@ jobs:
 
             if [ "$ksu_config" = "y" ]; then
                echo ">>> Setting up KittiSU (${{ github.event.inputs.KITTISU_BRANCH }})..."
-               curl -LSs "https://raw.githubusercontent.com/terebiko/kittisu/${{ github.event.inputs.KITTISU_BRANCH }}/kernel/setup.sh" | bash -s ${{ github.event.inputs.KITTISU_BRANCH }}
+               rm -rf KernelSU drivers/kernelsu
+               sed -i '/kernelsu/d' drivers/Makefile || true
+               sed -i '/drivers\/kernelsu\/Kconfig/d' drivers/Kconfig || true
+               curl -LSs "https://raw.githubusercontent.com/terebiko/KittiSU/${{ github.event.inputs.KITTISU_BRANCH }}/kernel/setup.sh" | bash -s ${{ github.event.inputs.KITTISU_BRANCH }}
             fi
 
             if [ "$susfs_config" = "y" ]; then
