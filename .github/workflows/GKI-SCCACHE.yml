@@ -59,11 +59,11 @@ on:
       ENABLE_SUSFS:
         description: 'Enable SUSFS Patch (Bật/Tắt SUSFS)'
         required: true
-        default: 'Enable'
+        default: 'Disable'
         type: choice
         options:
-        - Enable
         - Disable
+        - Enable
       USING_CCACHE:
         description: 'Using CCACHE'
         required: true
@@ -443,8 +443,9 @@ jobs:
           rm -rf $GITHUB_WORKSPACE/android-kernel/out/android12-5.10
           echo "CONFIG_KSU=y" >> arch/arm64/configs/gki_defconfig
 
+          echo "CONFIG_KSU_TRACEPOINT_HOOK=y" >> arch/arm64/configs/gki_defconfig
+
           if [ "${{ github.event.inputs.ENABLE_SUSFS }}" = "Enable" ]; then
-             echo "CONFIG_KSU_SUSFS_INLINE_HOOK=y" >> arch/arm64/configs/gki_defconfig
              echo "CONFIG_KSU_SUSFS=y" >> arch/arm64/configs/gki_defconfig
              echo "CONFIG_KSU_SUSFS_HAS_SU_COMPAT=y" >> arch/arm64/configs/gki_defconfig
              echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> arch/arm64/configs/gki_defconfig
@@ -459,7 +460,6 @@ jobs:
              echo "CONFIG_KSU_SUSFS_SUS_SU=y" >> arch/arm64/configs/gki_defconfig
              VARIANT_NAME="KittiSU-SUSFS"
           else
-             echo "CONFIG_KSU_TRACEPOINT_HOOK=y" >> arch/arm64/configs/gki_defconfig
              echo "CONFIG_KSU_SUSFS=n" >> arch/arm64/configs/gki_defconfig
              VARIANT_NAME="KittiSU"
           fi

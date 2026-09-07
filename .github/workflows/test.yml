@@ -58,11 +58,11 @@ on:
       ENABLE_SUSFS:
         description: 'Enable SUSFS Patch (Bật/Tắt SUSFS)'
         required: true
-        default: 'Enable'
+        default: 'Disable'
         type: choice
         options:
-        - Enable
         - Disable
+        - Enable
       BUILD_DTBO:
         description: 'DTBO Build Mode'
         required: true
@@ -656,6 +656,10 @@ jobs:
             echo "CONFIG_KSU=$ksu_config" >> arch/arm64/configs/gki_defconfig
             echo "CONFIG_BUILD_WITH_CCACHE=y" >> arch/arm64/configs/gki_defconfig
 
+            if [ "$ksu_config" = "y" ]; then
+                echo "CONFIG_KSU_TRACEPOINT_HOOK=y" >> arch/arm64/configs/gki_defconfig
+            fi
+
             if [ "$susfs_config" = "y" ]; then
                echo "CONFIG_KSU_SUSFS=y" >> arch/arm64/configs/gki_defconfig
                echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> arch/arm64/configs/gki_defconfig
@@ -668,7 +672,6 @@ jobs:
                echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> arch/arm64/configs/gki_defconfig
                echo "CONFIG_KSU_SUSFS_SUS_MAP=y" >> arch/arm64/configs/gki_defconfig
             else
-               echo "CONFIG_KSU_TRACEPOINT_HOOK=y" >> arch/arm64/configs/gki_defconfig
                echo "CONFIG_KSU_SUSFS=n" >> arch/arm64/configs/gki_defconfig
             fi
 
