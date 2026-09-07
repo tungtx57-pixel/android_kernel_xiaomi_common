@@ -33,7 +33,7 @@ extern void coresight_cti_unmap_trigout(
 extern void coresight_cti_reset(struct coresight_cti *cti);
 extern int coresight_cti_set_trig(struct coresight_cti *cti, int ch);
 extern void coresight_cti_clear_trig(struct coresight_cti *cti, int ch);
-static inline int __attribute__((weak)) coresight_cti_pulse_trig(struct coresight_cti *cti, int ch)
+static inline int coresight_cti_pulse_trig(struct coresight_cti *cti, int ch)
 {
 	return -ENODEV;
 }
